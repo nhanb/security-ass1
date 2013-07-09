@@ -1,0 +1,13 @@
+python ceasar.py e test1.txt 11 > ceasar_test1.enc
+python ceasar.py d ceasar_test1.enc 11 > ceasar_test1.dec
+
+python subst.py g test1.txt subst.key
+python subst.py e test1.txt subst.key > subst_test1.enc
+python subst.py d subst_test1.enc subst.key > subst_test1.dec
+
+python coltrans.py e test1.txt 11 > coltrans_test1.enc
+python coltrans.py d coltrans_test1.enc 11 > coltrans_test1.dec
+
+python vernam.py g test1.txt vernam.key 1000
+python vernam.py e test1.txt vernam.key 0 > vernam_test1.enc
+python vernam.py d vernam_test1.enc vernam.key 0 > vernam_test1.dec
