@@ -12,37 +12,47 @@ def run(args):
     if len(args) != 4:
         return "Invalid number of arguments."
 
-    try:
-        action = args[1]
-        inputf = args[2]
-        keyf = args[3]
+    action = args[1]
+    inputf = args[2]
+    keyf = args[3]
 
-        # Define the alphabet used in this Ceasar cipher implementation
-        alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ .,()-!?\n0123456789'
+    # Define the alphabet used in this Ceasar cipher implementation
+    alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ .,()-!?\n0123456789'
 
-        if action == "g":
-            handle_generate(inputf, alphabet)
-        elif action in ["e", "d"]:
-            substitute(inputf, keyf, alphabet)
+    # Key generation mode
+    if action == "g":
+        try:
+            with open(inputf, "w") as key_file:
+                key_file.write(generate_key(alphabet))
+                return "Key written to " + inputf
+        except IOError:
+            return "Could not write to " + inputf
 
-        with open(inputf, 'r'), open(keyf, 'r') as input_file, key_file:
+    # Encrypt / Decrypt mode
+    elif action in ["e", "d"]:
+        try:
+            with open(inputf, 'r') as input_file, open(keyf, 'r') as key_file:
+                input_text = input_file.read().upper()
+                input_text = input_text[:-1]  # Remove trailing \n
+                key_text = key_file.read()[:-1]
 
-            input_text = input_file.read().upper()
-            input_text = input_text[:-1]  # Remove trailing \n
+                # Check that input text doesn't contain any illegal char
+                if not (is_within_alphabet(input_text)
+                        and is_within_alphabet(key_text)):
+                    return "Input contains illegal character."
+                else:
+                    if action == "e":
+                        enc = True
+                    else:
+                        enc = False
+                    return substitute(input_text, key_text, enc)
 
-            # Check that input text doesn't contain any illegal char
-            if not is_within_alphabet(input_text):
-                return "Input contains illegal character."
+        except IOError:
+            return "Could not read from %s and %s" % (inputf, keyf)
 
-
-            # Call appropriate function according to action
-            #if action in ["e", "d"]:
-                #return ceasar(input_text, key, alphabet, action)
-            #else:
-                #return "Invalid action. Must be 'e' or 'd'"
-
-    except IOError:
-        return "Error reading %s & %s" % inputf, keyf
+    # Invalid action
+    else:
+        return "Unrecognized argument: " + action
 
 
 def is_within_alphabet(text):
@@ -52,19 +62,21 @@ def is_within_alphabet(text):
     return True
 
 
-def handle_generate(key_file, alphabet):
-    try:
-        with open(key_file, "w") as keyf:
-            keyf.write(generate(alphabet))
+def substitute(in_text, key, encrypt):
+    result = ""
+    if encrypt:
+        for char in in_text:
+            result += key[alphabet.find(char)]
+    else:
+        for char in in_text:
+            result += alphabet[key.find(char)]
+    return result
 
-    except IOError as err:
-        print err
 
-
-def generate(alphabet):
+def generate_key(alphabet):
 
     # For each character in the given alphabet, assign a random
-    # character as is correspond value (val)
+    # character as its correspond value (val)
     vals = alphabet
     result = ""
     for char in alphabet:
@@ -75,11 +87,6 @@ def generate(alphabet):
         vals = vals[:index] + vals[index + 1:]
 
         result += val
-        #if char == "\n":
-            #char = "\\n"
-        #if val == "\n":
-            #val = "\\n"
-        #keyf.write(char + "->" + val + "\n")
 
 
-run(sys.argv)
+print run(sys.argv)
