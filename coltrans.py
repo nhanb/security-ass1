@@ -13,6 +13,9 @@ def run(args):
         inputf = args[2]
         key = int(args[3])
 
+        if key <= 0:
+            return "Invalid input: key must be a positive number."
+
         with open(inputf, 'r') as input_file:
 
             input_text = input_file.read().upper()
@@ -39,28 +42,66 @@ def run(args):
         return "Please enter a valid integer as the key!"
 
 
-# Actual Ceasar cipher logic
-def column(input_text, key, alphabet, action):
+# Encrypt logic
+def encrypt(input_text, key, alphabet):
     size = len(input_text)
     table = []
 
-    if action == "e":
-        maxY = size / key
-        maxX = key
-        if size % key > 0:
-            maxY += 1
-        i = 0
-        for y in range(maxY):
-            table.append([])
-            for x in range(maxX):
-                if i >= size:
-                    char = " "
-                else:
-                    char = input_text[i]
-                table[y].append(char)
-                i += 1
+    maxY = size / key
+    maxX = key
+    if size % key > 0:
+        maxY += 1
+    i = 0
+    for y in range(maxY):
+        table.append([])
+        for x in range(maxX):
+            if i >= size:
+                char = " "
+            else:
+                char = input_text[i]
+            table[y].append(char)
+            i += 1
 
-    return table
+    output = ""
+    for x in range(maxX):
+        for y in range(maxY):
+            output += table[y][x]
+
+    return output
+
+
+# Decrypt logic
+def decrypt(input_text, key, alphabet):
+    size = len(input_text)
+    table = []
+
+    if size % key != 0:
+        return "Invalid input: cipher length must be divisible by key"
+
+    maxY = size / key
+    maxX = key
+
+    i = 0
+    for x in range(maxX):
+        table.append([])
+        for y in range(maxY):
+            table[x].append(input_text[i])
+            i += 1
+
+    output = ""
+    for y in range(maxY):
+        for x in range(maxX):
+            output += table[x][y]
+
+    return output
+
+
+# Actual columnar cipher logic
+def column(input_text, key, alphabet, action):
+    if action == "e":
+        return encrypt(input_text, key, alphabet)
+    else:
+        return decrypt(input_text, key, alphabet)
 
 
 # Run script and print result to standard output
