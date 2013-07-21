@@ -1,7 +1,7 @@
 import random
 import sys
 
-key_file = "subst.key"
+# Define the alphabet used in this Ceasar cipher implementation
 alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ .,()-!?\n0123456789'
 
 
@@ -15,9 +15,6 @@ def run(args):
     action = args[1]
     inputf = args[2]
     keyf = args[3]
-
-    # Define the alphabet used in this Ceasar cipher implementation
-    alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ .,()-!?\n0123456789'
 
     # Key generation mode
     if action == "g":
